@@ -1,0 +1,62 @@
+﻿@model InternProjects.Models.ViewModels.SubmissionCreateViewModel
+@{
+    ViewData["Title"] = "Предаване на резултат";
+}
+
+<nav class="mb-3"><a asp-controller="Dashboard" asp-action="Intern">← Към таблото</a></nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h3 class="mb-1">Предаване на резултат</h3>
+        <p class="text-muted">Задача: <strong>@Model.TaskTitle</strong></p>
+
+        @if (!string.IsNullOrEmpty(Model.SubmissionFormat))
+        {
+            <div class="alert alert-info">
+                <strong>Изискван формат:</strong> @Model.SubmissionFormat
+            </div>
+        }
+
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+            <input type="hidden" asp-for="AssignmentId" />
+
+            <div class="mb-3">
+                <label asp-for="SubmittedText" class="form-label">Текст</label>
+                <textarea asp-for="SubmittedText" class="form-control" rows="8"
+                          placeholder="Резултатът като текст (статия, описание, чеклист...)"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SubmittedLink" class="form-label">Линк</label>
+                <input asp-for="SubmittedLink" class="form-control"
+                       placeholder="https://... (GitHub, Google Docs, демо)" />
+                <span asp-validation-for="SubmittedLink" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="File" class="form-label">Файл</label>
+                    <input asp-for="File" type="file" class="form-control"
+                           accept=".pdf,.docx,.zip,.png,.jpg,.jpeg" />
+                    <div class="form-text">PDF, DOCX, ZIP, PNG, JPG — до 20 MB</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Photos" class="form-label">Снимки</label>
+                    <input asp-for="Photos" type="file" class="form-control" multiple
+                           accept=".png,.jpg,.jpeg" />
+                    <div class="form-text">Може няколко (напр. преди/след)</div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="SubmittedNotes" class="form-label">Бележки</label>
+                <textarea asp-for="SubmittedNotes" class="form-control" rows="3"
+                          placeholder="Допълнителни бележки към проверяващия (незадължително)"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Предай</button>
+            <a asp-controller="Dashboard" asp-action="Intern" class="btn btn-outline-secondary">Отказ</a>
+        </form>
+    </div>
+</div>

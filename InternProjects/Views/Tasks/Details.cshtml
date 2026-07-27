@@ -1,0 +1,89 @@
+﻿@model InternProjects.Models.TaskItem
+@{
+    ViewData["Title"] = Model.Title;
+    var myAssignment = ViewBag.MyAssignment as InternProjects.Models.TaskAssignment;
+}
+
+<nav class="mb-3"><a asp-action="Index">← Обратно към задачите</a></nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="d-flex gap-2 mb-2">
+            <span class="badge bg-secondary">@Model.Category?.Name</span>
+            <span class="badge bg-primary">@Model.Difficulty</span>
+            @if (Model.IsTeamTask)
+            {
+                <span class="badge bg-dark">Екипна (до @Model.MaxInterns души)</span>
+            }
+        </div>
+
+        <h2>@Model.Title</h2>
+        <p class="text-muted">@Model.ShortDescription</p>
+
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold">Описание и инструкции</h6>
+                <p class="mb-0" style="white-space: pre-line">@Model.LongDescription</p>
+            </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold">Формат на предаване</h6>
+                <p class="mb-0">@Model.SubmissionFormat</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-sm mb-3">
+                    <tr><td class="text-muted">Часове</td><td class="fw-bold">@Model.AssignedHours</td></tr>
+                    <tr><td class="text-muted">Приоритет</td><td>@Model.Priority</td></tr>
+                    <tr><td class="text-muted">Срок</td><td>@(Model.Deadline?.ToString("dd.MM.yyyy") ?? "—")</td></tr>
+                    <tr><td class="text-muted">Подходяща за</td><td>@(Model.SuitableFor ?? "Всички")</td></tr>
+                    <tr><td class="text-muted">Статус</td><td>@Model.Status</td></tr>
+                </table>
+
+                @if (myAssignment != null)
+                {
+                    <div class="alert alert-primary mb-2">
+                        Работиш по тази задача.
+                        <div class="small text-muted">Започната на @myAssignment.StartDate.ToString("dd.MM.yyyy")</div>
+                    </div>
+
+                    @if (myAssignment.Status == "В процес" || myAssignment.Status == "Върната за корекция")
+                    {
+                        <a asp-controller="Submissions" asp-action="Create" asp-route-assignmentId="@myAssignment.Id"
+                           class="btn btn-primary w-100">
+                            @(myAssignment.Status == "Върната за корекция" ? "Предай коригирана версия" : "Предай резултат")
+                        </a>
+                    }
+                    else if (myAssignment.Status == "Предадена за проверка")
+                    {
+                        <div class="alert alert-info text-center mb-0">Предадена — чака проверка.</div>
+                    }
+                    else if (myAssignment.Status == "Приета")
+                    {
+                        <div class="alert alert-success text-center mb-0">Приета ✔ Часовете са отчетени.</div>
+                    }
+                }
+                else if (Model.Status == "Свободна" && User.IsInRole("Intern"))
+                {
+                    <form asp-action="Choose" asp-route-id="@Model.Id" method="post"
+                          onsubmit="return confirm('Сигурен ли си? Задачата ще стане твоя отговорност.');">
+                        <button type="submit" class="btn btn-primary w-100">Избери тази задача</button>
+                    </form>
+                    <p class="text-muted small mt-2 mb-0">
+                        Часовете се признават след предаване и одобрение от администратор.
+                    </p>
+                }
+                else if (Model.Status != "Свободна")
+                {
+                    <div class="alert alert-secondary text-center mb-0">Задачата не е свободна.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

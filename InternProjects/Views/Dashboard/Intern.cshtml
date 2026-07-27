@@ -1,0 +1,160 @@
+﻿@model InternProjects.Models.ViewModels.InternDashboardViewModel
+@{
+    ViewData["Title"] = "Моето табло";
+}
+
+@{
+    var tasks = new[]
+    {
+        Model.ReturnedTasks.Select(x => new { Assignment = x, Text = "Върната за корекция", Class = "bg-warning text-dark" }),
+        Model.ActiveTasks.Select(x => new { Assignment = x, Text = "В процес", Class = "bg-primary" }),
+        Model.SubmittedTasks.Select(x => new { Assignment = x, Text = "Чака проверка", Class = "bg-info text-dark" }),
+        Model.AcceptedTasks.Select(x => new { Assignment = x, Text = "Приета", Class = "bg-success" })
+    }.SelectMany(x => x);
+}
+
+<h2 class="mb-1">Здравей, @Model.InternName</h2>
+<p class="text-muted mb-4">Преглед на твоя стаж</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md">
+        <div class="card bg-light h-100">
+            <div class="card-body text-center">
+                <div class="fs-3 fw-bold">@Model.TotalHours</div>
+                <div class="text-muted small">Изискуеми часове</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card bg-light h-100">
+            <div class="card-body text-center">
+                <div class="fs-3 fw-bold text-primary">@Model.TaskHours</div>
+                <div class="text-muted small">От задачи</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card bg-light h-100">
+            <div class="card-body text-center">
+                <div class="fs-3 fw-bold" style="color:#6f42c1">@Model.AddedHours</div>
+                <div class="text-muted small">Ръчно добавени</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card bg-light h-100">
+            <div class="card-body text-center">
+                <div class="fs-3 fw-bold text-success">@Model.ReportedHours</div>
+                <div class="text-muted small">Общо отчетени</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md">
+        <div class="card bg-light h-100">
+            <div class="card-body text-center">
+                <div class="fs-3 fw-bold text-danger">@Model.RemainingHours</div>
+                <div class="text-muted small">Оставащи</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <div class="d-flex justify-content-between small text-muted mb-1">
+        <span>Прогрес на стажа</span><span>@Model.ProgressPercent%</span>
+    </div>
+    <div class="progress" style="height: 10px;">
+        <div class="progress-bar bg-primary" style="width: @Model.ProgressPercent%"></div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Моите задачи</div>
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Задача</th>
+                            <th>Статус</th>
+                            <th class="text-end">Часове</th>
+                            <th class="text-end">Преглед</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (tasks.Any())
+                        {
+                            @foreach (var item in tasks)
+                            {
+                                <tr>
+                                    <td>@item.Assignment.Task?.Title</td>
+
+                                    <td>
+                                        <span class="badge @item.Class">
+                                            @item.Text
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        @item.Assignment.Task?.AssignedHours
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-controller="Tasks"
+                                           asp-action="Details"
+                                           asp-route-id="@item.Assignment.TaskId">
+                                            Виж
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Още нямаш избрани задачи — разгледай свободните вдясно.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.LatestFeedback))
+        {
+            <div class="alert alert-secondary mt-3 mb-0">
+                <strong>Последна обратна връзка:</strong> @Model.LatestFeedback
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Свободни задачи</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var t in Model.FreeTasks)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <div>@t.Title</div>
+                            <small class="text-muted">@t.Category?.Name · @t.AssignedHours ч. · @t.Difficulty</small>
+                        </div>
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-controller="Tasks" asp-action="Details" asp-route-id="@t.Id">Виж</a>
+                    </li>
+                }
+                @if (!Model.FreeTasks.Any())
+                {
+                    <li class="list-group-item text-center text-muted py-4">
+                        Няма свободни задачи в момента.
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

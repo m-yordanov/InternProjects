@@ -1,0 +1,118 @@
+﻿@model InternProjects.Models.ViewModels.UserCreateViewModel
+@{
+    ViewData["Title"] = "Нов потребител";
+}
+
+<nav class="mb-3"><a asp-action="Index">← Потребители</a></nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <h3 class="mb-4">Нов потребител</h3>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Акаунт</h6>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label">Име *</label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label">Фамилия *</label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label">Имейл *</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Телефон</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Password" class="form-label">Първоначална парола *</label>
+                            <input asp-for="Password" class="form-control" />
+                            <div class="form-text">Стажантът може да я смени по-късно (или ти — от Редакция)</div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Role" class="form-label">Роля *</label>
+                            <select asp-for="Role" class="form-select" id="roleSelect">
+                                <option value="Intern">Стажант</option>
+                                <option value="Admin">Администратор</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3" id="internSection">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Данни за стажа</h6>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="University" class="form-label">Университет/Училище</label>
+                            <input asp-for="University" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Specialty" class="form-label">Специалност</label>
+                            <input asp-for="Specialty" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="StartDate" class="form-label">Начало *</label>
+                            <input asp-for="StartDate" class="form-control" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="EndDate" class="form-label">Край</label>
+                            <input asp-for="EndDate" class="form-control" />
+                            <span asp-validation-for="EndDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="TotalHours" class="form-label">Изискуеми часове *</label>
+                            <input asp-for="TotalHours" class="form-control" type="number" />
+                            <span asp-validation-for="TotalHours" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <label asp-for="Notes" class="form-label">Бележки</label>
+                        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Създай потребителя</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const roleSelect = document.getElementById('roleSelect');
+        const internSection = document.getElementById('internSection');
+        function toggleIntern() {
+            internSection.style.display = roleSelect.value === 'Intern' ? '' : 'none';
+        }
+        roleSelect.addEventListener('change', toggleIntern);
+        toggleIntern();
+    </script>
+}

@@ -1,0 +1,40 @@
+﻿@model List<InternProjects.Models.ViewModels.SummaryReportRow>
+@{
+    ViewData["Title"] = "Общ отчет";
+}
+
+<nav class="mb-3"><a asp-action="Index">← Справки</a></nav>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Общ отчет</h3>
+    <a asp-action="SummaryCsv" class="btn btn-outline-success">⬇ Export CSV</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr><th>Стажант</th><th>Изискуеми</th><th>Отчетени</th><th>Оставащи</th><th style="width:30%">Изпълнение</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td><a asp-controller="InternProfile" asp-action="Details" asp-route-id="@r.InternId">@r.InternName</a></td>
+                        <td>@r.TotalHours</td>
+                        <td class="text-success fw-bold">@r.ReportedHours</td>
+                        <td class="text-danger">@r.RemainingHours</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar @(r.Percent >= 85 ? "bg-success" : r.Percent < 25 ? "bg-danger" : "bg-primary")"
+                                         style="width: @r.Percent%"></div>
+                                </div>
+                                <span class="small text-muted">@r.Percent%</span>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div></div>

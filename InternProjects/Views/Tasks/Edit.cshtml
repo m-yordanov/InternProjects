@@ -1,0 +1,30 @@
+﻿@model InternProjects.Models.ViewModels.TaskEditViewModel
+@{
+    ViewData["Title"] = "Редакция на задача";
+}
+
+<nav class="mb-3"><a asp-action="Manage">← Управление на задачи</a></nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Редакция: @Model.Title</h3>
+            <span class="badge bg-secondary fs-6">@Model.Status</span>
+        </div>
+
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <partial name="_TaskFormFields" model="Model" />
+
+            <button type="submit" class="btn btn-primary">Запази промените</button>
+            <a asp-action="Manage" class="btn btn-outline-secondary">Отказ</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_TaskFormScripts" />
+}

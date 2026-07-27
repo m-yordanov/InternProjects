@@ -1,0 +1,56 @@
+﻿@model List<InternProjects.Models.ViewModels.HoursReportRow>
+@{
+    ViewData["Title"] = "Справка по часове";
+    var from = ViewBag.From as DateTime?;
+    var to = ViewBag.To as DateTime?;
+}
+
+<nav class="mb-3"><a asp-action="Index">← Справки</a></nav>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Справка по часове</h3>
+    <a asp-action="HoursCsv" asp-route-from="@from?.ToString("yyyy-MM-dd")"
+       asp-route-to="@to?.ToString("yyyy-MM-dd")" class="btn btn-outline-success">⬇ Export CSV</a>
+</div>
+
+<form method="get" class="card bg-light mb-3">
+    <div class="card-body row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small text-muted">От дата</label>
+            <input type="date" name="from" value="@from?.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small text-muted">До дата</label>
+            <input type="date" name="to" value="@to?.ToString("yyyy-MM-dd")" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Филтрирай</button>
+            <a asp-action="Hours" class="btn btn-outline-secondary">Изчисти</a>
+        </div>
+        <div class="col-md-3 text-end">
+            <div class="fs-5">Общо: <strong>@Model.Sum(r => r.Hours) ч.</strong></div>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover table-sm align-middle mb-0">
+            <thead class="table-light">
+                <tr><th>Стажант</th><th>Дата</th><th>Източник</th><th>Описание</th><th>Часове</th><th>Добавено от</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td>@r.InternName</td>
+                        <td class="text-muted small">@r.Date.ToString("dd.MM.yyyy")</td>
+                        <td><span class="badge @(r.Source == "Задача" ? "bg-primary" : "bg-secondary")">@r.Source</span></td>
+                        <td class="small">@r.Description</td>
+                        <td class="fw-bold">@r.Hours</td>
+                        <td class="text-muted small">@r.AddedBy</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div></div>

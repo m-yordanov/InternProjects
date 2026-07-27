@@ -1,0 +1,100 @@
+﻿@model InternProjects.Models.ViewModels.TaskCreateViewModel
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="fw-bold mb-3">Основна информация</h6>
+
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label">Заглавие *</label>
+            <input asp-for="Title" class="form-control" placeholder="Напр.: Как да разпознаем фишинг имейл" />
+            <span asp-validation-for="Title" class="text-danger small"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="CategoryId" class="form-label">Категория *</label>
+                <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
+                    <option value="">— избери —</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="SuitableFor" class="form-label">Подходяща за</label>
+                <input asp-for="SuitableFor" class="form-control" placeholder="Напр.: Киберсигурност, Маркетинг" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ShortDescription" class="form-label">Кратко описание</label>
+            <input asp-for="ShortDescription" class="form-control"
+                   placeholder="Едно изречение — показва се в списъка със задачи" />
+        </div>
+
+        <div class="mb-0">
+            <label asp-for="LongDescription" class="form-label">Описание и инструкции</label>
+            <textarea asp-for="LongDescription" class="form-control" rows="6"
+                      placeholder="Пълно описание: какво се очаква, изисквания, критерии за приемане..."></textarea>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="fw-bold mb-3">Предаване и оценка</h6>
+
+        <div class="mb-3">
+            <label asp-for="SubmissionFormat" class="form-label">Формат на предаване *</label>
+            <input asp-for="SubmissionFormat" class="form-control"
+                   placeholder="Напр.: снимка преди; снимка след; кратко описание" />
+            <div class="form-text">Какво точно трябва да предаде стажантът</div>
+            <span asp-validation-for="SubmissionFormat" class="text-danger small"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="AssignedHours" class="form-label">Зададени часове *</label>
+                <input asp-for="AssignedHours" class="form-control" type="number" step="0.5" min="0.5" />
+                <span asp-validation-for="AssignedHours" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="Difficulty" class="form-label">Сложност *</label>
+                <select asp-for="Difficulty" class="form-select">
+                    <option value="">— избери —</option>
+                    <option>Лесна</option>
+                    <option>Средна</option>
+                    <option>Трудна</option>
+                    <option>Екипна</option>
+                </select>
+                <span asp-validation-for="Difficulty" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="Priority" class="form-label">Приоритет *</label>
+                <select asp-for="Priority" class="form-select">
+                    <option value="">— избери —</option>
+                    <option>Нисък</option>
+                    <option>Нормален</option>
+                    <option>Висок</option>
+                </select>
+                <span asp-validation-for="Priority" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="row align-items-end">
+            <div class="col-md-4 mb-3">
+                <label asp-for="Deadline" class="form-label">Срок</label>
+                <input asp-for="Deadline" class="form-control" />
+                <span asp-validation-for="Deadline" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="form-check">
+                    <input asp-for="IsTeamTask" class="form-check-input" id="isTeam" />
+                    <label asp-for="IsTeamTask" class="form-check-label">Екипна задача</label>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3" id="maxInternsBox" style="display:none">
+                <label asp-for="MaxInterns" class="form-label">Макс. стажанти</label>
+                <input asp-for="MaxInterns" class="form-control" type="number" min="2" max="10" />
+                <span asp-validation-for="MaxInterns" class="text-danger small"></span>
+            </div>
+        </div>
+    </div></div>

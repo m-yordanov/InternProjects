@@ -1,0 +1,158 @@
+﻿@model InternProjects.Models.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Админ табло";
+}
+ 
+<h2 class="mb-1">Административно табло</h2>
+<p class="text-muted mb-4">Обзор на стажантската програма</p>
+ 
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-4">
+        <div class="card bg-light h-100"><div class="card-body text-center">
+            <div class="fs-3 fw-bold">@Model.TotalInterns</div>
+            <div class="text-muted small">Общо стажанти</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="card bg-light h-100"><div class="card-body text-center">
+            <div class="fs-3 fw-bold text-success">@Model.ActiveInterns</div>
+            <div class="text-muted small">Активни стажанти</div>
+        </div></div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card bg-light h-100"><div class="card-body text-center">
+            <div class="fs-3 fw-bold text-primary">@Model.TotalReportedHours</div>
+            <div class="text-muted small">Общо отчетени часове</div>
+        </div></div>
+    </div>
+</div>
+ 
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md">
+        <div class="card border-info h-100"><div class="card-body text-center">
+            <div class="fs-4 fw-bold text-info">@Model.TasksForReview</div>
+            <div class="text-muted small">За проверка</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card h-100"><div class="card-body text-center">
+            <div class="fs-4 fw-bold">@Model.FreeTasks</div>
+            <div class="text-muted small">Свободни</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card h-100"><div class="card-body text-center">
+            <div class="fs-4 fw-bold text-primary">@Model.TasksInProgress</div>
+            <div class="text-muted small">В процес</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md">
+        <div class="card h-100"><div class="card-body text-center">
+            <div class="fs-4 fw-bold text-warning">@Model.ReturnedTasks</div>
+            <div class="text-muted small">Върнати</div>
+        </div></div>
+    </div>
+    <div class="col-12 col-md">
+        <div class="card h-100"><div class="card-body text-center">
+            <div class="fs-4 fw-bold text-success">@Model.AcceptedTasks</div>
+            <div class="text-muted small">Приети</div>
+        </div></div>
+    </div>
+</div>
+ 
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Последни предадени задачи</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Задача</th>
+                            <th>Стажант</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th class="text-end">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="Review"
+                                   asp-action="Index">
+                                    Всички
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.LatestSubmissions)
+                        {
+                            <tr>
+                                <td>@a.Task?.Title</td>
+                                <td>@a.Intern?.User?.FirstName @a.Intern?.User?.LastName</td>
+                                <td>@a.SubmitDate?.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    @if (a.Status == "Предадена за проверка")
+                                    { <span class="badge bg-info text-dark">Чака проверка</span> }
+                                    else if (a.Status == "Приета")
+                                    { <span class="badge bg-success">Приета</span> }
+                                    else if (a.Status == "Върната за корекция")
+                                    { <span class="badge bg-warning text-dark">Върната</span> }
+                                    else
+                                    { <span class="badge bg-secondary">@a.Status</span> }
+                                </td>
+                                <td>
+                                       <a class="btn btn-sm btn-outline-primary"
+                                       asp-controller="Review"
+                                       asp-action="Details"
+                                       asp-route-id="@a.TaskId">
+                                        Виж
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.LatestSubmissions.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">Няма предадени задачи още.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+ 
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-white fw-bold">Стажанти с малка активност</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var i in Model.LowActivityInterns)
+                {
+                    var pct = i.TotalHours > 0 ? (int)Math.Round(i.ReportedHours / i.TotalHours * 100) : 0;
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@i.User?.FirstName @i.User?.LastName</span>
+                        <span class="text-muted small">@i.ReportedHours / @i.TotalHours ч. (@pct%)</span>
+                    </li>
+                }
+                @if (!Model.LowActivityInterns.Any())
+                {
+                    <li class="list-group-item text-center text-muted py-3">Няма стажанти с ниска активност.</li>
+                }
+            </ul>
+        </div>
+ 
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Близо до завършване</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var i in Model.NearCompletionInterns)
+                {
+                    var pct = i.TotalHours > 0 ? (int)Math.Round(i.ReportedHours / i.TotalHours * 100) : 0;
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@i.User?.FirstName @i.User?.LastName</span>
+                        <span class="badge bg-success">@pct%</span>
+                    </li>
+                }
+                @if (!Model.NearCompletionInterns.Any())
+                {
+                    <li class="list-group-item text-center text-muted py-3">Никой още не е близо до 240 часа.</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

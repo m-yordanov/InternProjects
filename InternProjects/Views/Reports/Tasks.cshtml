@@ -1,0 +1,70 @@
+﻿@model List<InternProjects.Models.ViewModels.TaskReportRow>
+@{
+    ViewData["Title"] = "Справка по задачи";
+}
+
+<nav class="mb-3"><a asp-action="Index">← Справки</a></nav>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Справка по задачи</h3>
+    <a asp-action="TasksCsv" class="btn btn-outline-success">⬇ Export CSV</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover table-sm align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Заглавие</th>
+                    <th>Категория</th>
+                    <th>Статус</th>
+                    <th>Избрана от</th>
+                    <th>Часове</th>
+                    <th>Предадена</th>
+                    <th>Приета</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td>@r.Title</td>
+                        <td class="text-muted">@r.Category</td>
+                        <td>
+                            @if (r.Status == "Предадена за проверка")
+                            {
+                                <span class="badge bg-info text-dark">Чака проверка</span>
+                            }
+                            else if (r.Status == "Приета")
+                            {
+
+                                <span class="badge bg-success">Приета</span>
+                            }
+                            else if (r.Status == "Върната за корекция")
+                            {
+
+                                <span class="badge bg-danger">Върната</span>
+                            }
+                            else if (r.Status == "В процес")
+                            {
+                                <span class="badge bg-warning text-dark">Възложена</span>
+                            }
+                            else if (r.Status == "Свободна")
+                            {
+                                <span class="badge bg-primary">Свободна</span>
+                            }
+                            else
+                            {
+
+                                <span class="badge bg-secondary">@r.Status</span>
+                            }
+                        </td>
+                        <td>@r.ChosenBy</td>
+                        <td>@r.AssignedHours</td>
+                        <td class="text-muted small">@(r.SubmitDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                        <td class="text-muted small">@(r.AcceptDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div></div>

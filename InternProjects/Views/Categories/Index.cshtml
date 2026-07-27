@@ -1,0 +1,48 @@
+@model List<InternProjects.Models.ViewModels.CategoryListItemViewModel>
+@{
+    ViewData["Title"] = "Категории";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2 class="mb-0">Управление на категории</h2>
+    <a asp-action="Create" class="btn btn-primary">+ Нова категория</a>
+</div>
+<p class="text-muted mb-3">Категориите групират задачите</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Име</th>
+                    <th>Описание</th>
+                    <th class="text-center">Задачи</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@c.Name</td>
+                        <td class="text-muted small">@c.Description</td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark border">@c.TaskCount</span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Редакция</a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="4" class="text-center text-muted py-5">Няма категории.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div></div>

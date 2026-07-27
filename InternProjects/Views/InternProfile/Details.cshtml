@@ -1,0 +1,178 @@
+﻿@model InternProjects.Models.ViewModels.InternProfileViewModel
+@{
+    var i = Model.Intern;
+    ViewData["Title"] = $"Профил: {i.User?.FirstName} {i.User?.LastName}";
+}
+
+@if (User.IsInRole("Admin"))
+{
+    <nav class="mb-3"><a asp-controller="Dashboard" asp-action="Admin">← Към таблото</a></nav>
+}
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h4 class="mb-0">@i.User?.FirstName @i.User?.LastName</h4>
+                <p class="text-muted mb-3">@i.Specialty</p>
+
+                <table class="table table-sm mb-0">
+                    <tr><td class="text-muted">Имейл</td><td>@i.User?.Email</td></tr>
+                    <tr><td class="text-muted">Телефон</td><td>@(i.User?.PhoneNumber ?? "—")</td></tr>
+                    <tr><td class="text-muted">Университет</td><td>@(i.University ?? "—")</td></tr>
+                    <tr><td class="text-muted">Начало на стажа</td><td>@i.StartDate.ToString("dd.MM.yyyy")</td></tr>
+                    <tr><td class="text-muted">Край на стажа</td><td>@(i.EndDate.ToString("dd.MM.yyyy") ?? "—")</td></tr>
+                    <tr><td class="text-muted">Ментор</td><td>@(i.Mentor != null ? $"{i.Mentor.FirstName} {i.Mentor.LastName}" : "—")</td></tr>
+                    <tr>
+                        <td class="text-muted">Статус</td>
+                        <td><span class="badge @(i.User?.Status == "Активен" ? "bg-success" : "bg-secondary")">@i.User?.Status</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(i.Notes) && User.IsInRole("Admin"))
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="fw-bold">Бележки</h6>
+                    <p class="mb-0 small">@i.Notes</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-8">
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-md">
+                <div class="card bg-light h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-4 fw-bold">@i.TotalHours</div>
+                        <div class="text-muted small">Изискуеми</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md">
+                <div class="card bg-light h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-4 fw-bold text-primary">@i.TaskHours</div>
+                        <div class="text-muted small">От задачи</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md">
+                <div class="card bg-light h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-4 fw-bold" style="color:#6f42c1">@i.AddedHours</div>
+                        <div class="text-muted small">Ръчни</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md">
+                <div class="card bg-light h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-4 fw-bold text-success">@i.ReportedHours</div>
+                        <div class="text-muted small">Отчетени</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="card bg-light h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-4 fw-bold text-danger">@i.RemainingHours</div>
+                        <div class="text-muted small">Оставащи</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress mb-1" style="height: 10px;">
+            <div class="progress-bar bg-primary" style="width: @Model.ProgressPercent%"></div>
+        </div>
+        <p class="text-muted small mb-4">
+            @Model.ProgressPercent% изпълнение
+            · Приети: @Model.AcceptedCount · Активни: @Model.InProgressCount · За корекция: @Model.ReturnedCount
+        </p>
+
+        <div class="card mb-4">
+            <div class="card-header bg-white fw-bold">История на задачите</div>
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Задача</th><th>Категория</th><th>Статус</th><th>Часове</th><th>Започната</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.Assignments)
+                        {
+                            <tr>
+                                <td>
+                                    @if (User.IsInRole("Admin") && a.Status == "Предадена за проверка")
+                                    {
+                                        <a asp-controller="Review" asp-action="Details" asp-route-id="@a.Id">@a.Task?.Title</a>
+                                    }
+                                    else
+                                    {
+                                        @a.Task?.Title
+                                    }
+                                </td>
+                                <td class="text-muted small">@a.Task?.Category?.Name</td>
+                                <td>
+                                    <span class="badge @(a.Status == "Приета" ? "bg-success" :
+                                                                                                   a.Status == "В процес" ? "bg-primary" :
+                                                                                                   a.Status == "Предадена за проверка" ? "bg-info text-dark" :
+                                                                                                   a.Status == "Върната за корекция" ? "bg-warning text-dark" :
+                                                                                                   "bg-secondary")">@a.Status</span>
+                                </td>
+                                <td>@a.Task?.AssignedHours ч.</td>
+                                <td class="text-muted small">@a.StartDate.ToString("dd.MM.yyyy")</td>
+                            </tr>
+                        }
+                        @if (!Model.Assignments.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-4">Няма задачи още.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                История на часовете
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="ManualHours" asp-action="Create" asp-route-internId="@Model.Intern.Id"
+                       class="btn btn-sm btn-primary">+ Добави часове</a>
+                }
+            </div>
+
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Дата</th><th>Източник</th><th>Описание</th><th>Часове</th><th>Добавено от</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model.TimeLogs)
+                        {
+                            <tr>
+                                <td class="text-muted small">@t.Date.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <span class="badge @(t.SourceType == "task" ? "bg-primary" : "bg-secondary")">
+                                        @(t.SourceType == "task" ? "Задача" : "Ръчно")
+                                    </span>
+                                </td>
+                                <td>@t.Description</td>
+                                <td class="fw-bold">+@t.Hours ч.</td>
+                                <td class="text-muted small">@(t.CreatedBy != null ? $"{t.CreatedBy.FirstName} {t.CreatedBy.LastName}" : "—")</td>
+                            </tr>
+                        }
+                        @if (!Model.TimeLogs.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-4">Няма отчетени часове още.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+﻿@model List<InternProjects.Models.TaskAssignment>
+@{
+    ViewData["Title"] = "Задачи за проверка";
+}
+
+<h2 class="mb-1">Задачи за проверка</h2>
+<p class="text-muted mb-4">Предадени задачи, чакащи одобрение</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-warning">@TempData["Error"]</div>
+}
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Задача</th>
+                    <th>Стажант</th>
+                    <th>Часове</th>
+                    <th>Предадена на</th>
+                    <th class="text-end">Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model)
+                {
+                    <tr>
+                        <td>
+                            @a.Task?.Title
+                            <div class="small text-muted">@a.Task?.Category?.Name</div>
+                        </td>
+                        <td>@a.Intern?.User?.FirstName @a.Intern?.User?.LastName</td>
+                        <td>@a.Task?.AssignedHours ч.</td>
+                        <td>@a.SubmitDate?.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@a.Id" class="btn btn-sm btn-primary">
+                                Провери
+                            </a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">
+                            Няма задачи за проверка.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

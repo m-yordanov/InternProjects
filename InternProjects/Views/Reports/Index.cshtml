@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Справки";
+}
+
+<h2 class="mb-4">Справки</h2>
+
+<div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5>По стажант</h5>
+                <p class="text-muted small">Задачи, часове и прогрес на конкретен стажант.</p>
+                <a asp-controller="Dashboard" asp-action="Admin" class="btn btn-sm btn-outline-primary">Избери от таблото</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5>По задачи</h5>
+                <p class="text-muted small">Всички задачи: статус, кой ги е избрал, дати.</p>
+                <a asp-action="Tasks" class="btn btn-sm btn-primary">Отвори</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5>По часове</h5>
+                <p class="text-muted small">Всеки запис за часове: източник, описание, одобрение.</p>
+                <a asp-action="Hours" class="btn btn-sm btn-primary">Отвори</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5>Общ отчет</h5>
+                <p class="text-muted small">Всички стажанти с процент изпълнение.</p>
+                <a asp-action="Summary" class="btn btn-sm btn-primary">Отвори</a>
+            </div>
+        </div>
+    </div>
+</div>

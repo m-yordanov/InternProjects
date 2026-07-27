@@ -1,0 +1,38 @@
+﻿@model InternProjects.Models.ViewModels.TaskCreateViewModel
+@{
+    ViewData["Title"] = "Нова задача";
+}
+
+<nav class="mb-3"><a asp-action="Index">← Към задачите</a></nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <h3 class="mb-4">Създаване на задача</h3>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+            <partial name="_TaskFormFields" model="Model" />
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="form-check mb-0">
+                        <input asp-for="PublishNow" class="form-check-input" />
+                        <label asp-for="PublishNow" class="form-check-label">
+                            Публикувай веднага
+                            <div class="small text-muted">Без отметка задачата се запазва като чернова</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Създай задачата</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_TaskFormScripts" />
+}

@@ -1,0 +1,172 @@
+﻿@model InternProjects.Models.ViewModels.ReviewDetailsViewModel
+@{
+    ViewData["Title"] = "Проверка на задача";
+    var s = Model.LatestSubmission;
+}
+
+<nav class="mb-3"><a asp-action="Index">← Всички за проверка</a></nav>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-warning">@TempData["Error"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h4 class="mb-1">@Model.Assignment.Task?.Title</h4>
+        <p class="text-muted">
+            Стажант: <strong>@Model.Assignment.Intern?.User?.FirstName @Model.Assignment.Intern?.User?.LastName</strong>
+            · Предадена: @Model.Assignment.SubmitDate?.ToString("dd.MM.yyyy HH:mm")
+            @if (s != null)
+            {
+                <span>· Версия @s.Version</span>
+            }
+        </p>
+
+        @if (s == null)
+        {
+            <div class="alert alert-danger">Няма предаване към тази задача (несъответствие в данните).</div>
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(s.SubmittedText))
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Предаден текст</h6>
+                        <p class="mb-0" style="white-space: pre-line">@s.SubmittedText</p>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(s.SubmittedLink))
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Линк</h6>
+                        <a href="@s.SubmittedLink" target="_blank" rel="noopener">@s.SubmittedLink</a>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(s.SubmittedFile))
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Файл</h6>
+                        <a href="@s.SubmittedFile" target="_blank" class="btn btn-sm btn-outline-primary">
+                            Отвори файла
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(s.SubmittedPhotos))
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Снимки</h6>
+                        <div class="row g-2">
+                            @foreach (var photo in s.SubmittedPhotos.Split(';'))
+                            {
+                                <div class="col-4">
+                                    <a href="@photo" target="_blank">
+                                        <img src="@photo" class="img-fluid rounded border" alt="Предадена снимка" />
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(s.SubmittedNotes))
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Бележки от стажанта</h6>
+                        <p class="mb-0">@s.SubmittedNotes</p>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (Model.Submissions.Count > 1)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="fw-bold">История на предаванията</h6>
+                    <ul class="list-unstyled mb-0 small">
+                        @foreach (var old in Model.Submissions.Skip(1))
+                        {
+                            <li class="border-top py-2">
+                                <strong>Версия @old.Version</strong> — @old.SubmitDate.ToString("dd.MM.yyyy")
+                                · @old.StatusSubmission
+                                @if (!string.IsNullOrEmpty(old.MentorFeedback))
+                                {
+                                    <div class="text-muted">Обратна връзка: @old.MentorFeedback</div>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Задачата (т. 18)</h6>
+                <table class="table table-sm mb-0">
+                    <tr><td class="text-muted">Зададени часове</td><td class="fw-bold">@Model.Assignment.Task?.AssignedHours</td></tr>
+                    <tr><td class="text-muted">Изискван формат</td><td>@Model.Assignment.Task?.SubmissionFormat</td></tr>
+                    <tr><td class="text-muted">Сложност</td><td>@Model.Assignment.Task?.Difficulty</td></tr>
+                    <tr><td class="text-muted">Срок</td><td>@(Model.Assignment.Task?.Deadline?.ToString("dd.MM.yyyy") ?? "—")</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card border-primary">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Решение</h6>
+
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Обратна връзка към стажанта</label>
+                    <textarea id="feedback" class="form-control" rows="4"
+                              placeholder="Напр.: „Прието. Текстът може да се използва след редакция." или „Върнато — добави поне 3 реални примера.""></textarea>
+                </div>
+
+                <form asp-action="Accept" asp-route-id="@Model.Assignment.Id" method="post" class="d-grid mb-2"
+                      onsubmit="return confirm('Приемаш задачата? @Model.Assignment.Task?.AssignedHours ч. ще бъдат начислени на стажанта. Действието не може да се отмени оттук.');">
+                    <input type="hidden" name="feedback" class="feedback-copy" />
+                    <button type="submit" class="btn btn-success">
+                        ✔ Приеми (+@Model.Assignment.Task?.AssignedHours ч.)
+                    </button>
+                </form>
+
+                <form asp-action="Return" asp-route-id="@Model.Assignment.Id" method="post" class="d-grid mb-2">
+                    <input type="hidden" name="feedback" class="feedback-copy" />
+                    <button type="submit" class="btn btn-warning">↩ Върни за корекция</button>
+                </form>
+
+                <form asp-action="Reject" asp-route-id="@Model.Assignment.Id" method="post" class="d-grid"
+                      onsubmit="return confirm('Отхвърляш задачата? Часове няма да бъдат начислени.');">
+                    <input type="hidden" name="feedback" class="feedback-copy" />
+                    <button type="submit" class="btn btn-outline-danger">✖ Отхвърли</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('form').forEach(f => {
+            f.addEventListener('submit', () => {
+                const copy = f.querySelector('.feedback-copy');
+                if (copy) copy.value = document.getElementById('feedback').value;
+            });
+        });
+    </script>
+}

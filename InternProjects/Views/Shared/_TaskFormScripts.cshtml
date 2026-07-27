@@ -1,0 +1,7 @@
+﻿<script>
+    const isTeam = document.getElementById('isTeam');
+    const box = document.getElementById('maxInternsBox');
+    function toggleBox() { box.style.display = isTeam.checked ? '' : 'none'; }
+    isTeam.addEventListener('change', toggleBox);
+    toggleBox();
+</script>
