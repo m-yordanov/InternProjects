@@ -1,0 +1,17 @@
+# Secrets
+.env
+.env.txt
+
+# Visual Studio
+.vs/
+
+# Build output
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Docker local overrides
+docker-compose.override.yml
