@@ -62,6 +62,16 @@
                                     @(u.Status == "Активен" ? "Деактивирай" : "Активирай")
                                 </button>
                             </form>
+                            <form asp-action="Delete"
+                                  asp-route-id="@u.Id"
+                                  method="post"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Сигурни ли сте, че искате да изтриете @u.FullName?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    Изтрий
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 }

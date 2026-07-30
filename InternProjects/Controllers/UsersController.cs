@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using InternProjects.Data;
+using InternProjects.Models;
+using InternProjects.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using InternProjects.Data;
-using InternProjects.Models;
-using InternProjects.Models.ViewModels;
 
 namespace InternProjects.Controllers
 {
@@ -84,7 +85,7 @@ namespace InternProjects.Controllers
                         University = model.University,
                         Specialty = model.Specialty,
                         StartDate = model.StartDate,
-                        EndDate = (DateTime)model.EndDate,
+                        EndDate = model.EndDate,
                         TotalHours = model.TotalHours,
                         TaskHours = 0,
                         AddedHours = 0,
@@ -100,7 +101,7 @@ namespace InternProjects.Controllers
             catch
             {
                 await transaction.RollbackAsync();
-                ModelState.AddModelError("", "Грешка при създаването. Нищо не е записано — опитай пак.");
+                ModelState.AddModelError("", "Грешка при създаването. Нищо не е записано - опитай пак.");
                 return View(model);
             }
 
@@ -178,5 +179,42 @@ namespace InternProjects.Controllers
                 : $"{user.FirstName} {user.LastName} е активиран.";
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            if (id == currentUserId)
+            {
+                TempData["Error"] = "Не можете да изтриете собствения си акаунт.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Потребителят не беше намерен.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var intern = await _context.Interns
+                .FirstOrDefaultAsync(i => i.UserId == id);
+
+            if (intern != null)
+            {
+                _context.Interns.Remove(intern);
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Потребителят беше изтрит успешно.";
+            return RedirectToAction(nameof(Index));
+        }
+
+
     }
 }

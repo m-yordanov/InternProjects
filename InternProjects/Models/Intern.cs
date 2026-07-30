@@ -7,10 +7,10 @@ namespace InternProjects.Models
         public int Id { get; set; }
         public int UserId { get; set; }
         public User? User { get; set; }
-        public string University { get; set; }
-        public string Specialty { get; set; }
+        public string? University { get; set; }
+        public string? Specialty { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public float TotalHours { get; set; } = 240;
         public float TaskHours { get; set; }
         public float AddedHours { get; set; }

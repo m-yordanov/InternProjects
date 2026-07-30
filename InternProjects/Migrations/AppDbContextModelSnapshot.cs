@@ -22,6 +22,40 @@ namespace InternProjects.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("InternProjects.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EntityType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ActivityLogs");
+                });
+
             modelBuilder.Entity("InternProjects.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -39,7 +73,7 @@ namespace InternProjects.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("InternProjects.Models.Intern", b =>
@@ -53,7 +87,7 @@ namespace InternProjects.Migrations
                     b.Property<float>("AddedHours")
                         .HasColumnType("real");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("MentorId")
@@ -98,7 +132,7 @@ namespace InternProjects.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Intern");
+                    b.ToTable("Interns");
                 });
 
             modelBuilder.Entity("InternProjects.Models.Submission", b =>
@@ -152,7 +186,7 @@ namespace InternProjects.Migrations
 
                     b.HasIndex("ReviewedById");
 
-                    b.ToTable("Submission");
+                    b.ToTable("Submissions");
                 });
 
             modelBuilder.Entity("InternProjects.Models.TaskAssignment", b =>
@@ -185,7 +219,7 @@ namespace InternProjects.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.ToTable("TaskAssignment");
+                    b.ToTable("TaskAssignments");
                 });
 
             modelBuilder.Entity("InternProjects.Models.TaskItem", b =>
@@ -252,7 +286,7 @@ namespace InternProjects.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("TaskItem");
+                    b.ToTable("TaskItems");
                 });
 
             modelBuilder.Entity("InternProjects.Models.TimeLog", b =>
@@ -305,7 +339,7 @@ namespace InternProjects.Migrations
 
                     b.HasIndex("InternId");
 
-                    b.ToTable("TimeLog");
+                    b.ToTable("TimeLogs");
                 });
 
             modelBuilder.Entity("InternProjects.Models.User", b =>
@@ -358,7 +392,18 @@ namespace InternProjects.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("InternProjects.Models.ActivityLog", b =>
+                {
+                    b.HasOne("InternProjects.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InternProjects.Models.Intern", b =>

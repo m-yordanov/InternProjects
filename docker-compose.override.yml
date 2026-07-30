@@ -2,13 +2,13 @@ services:
 
   web:
     environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=InternProjectsDB;User Id=sa;Password=SecretPassword!123;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=InternProjectsDB;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true"
 
-      ConnectionStrings__AppDbContext: "Server=sqlserver;Database=AppDbContext;User Id=sa;Password=SecretPassword!123;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      ConnectionStrings__AppDbContext: "Server=sqlserver;Database=AppDbContext;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true"
 
 
   sqlserver:
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Express"
-      MSSQL_SA_PASSWORD: "SecretPassword!123"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
