@@ -4,10 +4,9 @@
 
 Make sure you have the following installed:
 
-- Docker
-- Docker Compose (included with Docker Desktop)
+- Docker Desktop (includes Docker Engine and Docker Compose)
 
-Verify installation:
+Verify the installation:
 
 ```bash
 docker --version
@@ -16,7 +15,7 @@ docker compose version
 
 ---
 
-# Running the Application with Docker
+# Running the Application
 
 ## 1. Clone the repository
 
@@ -27,44 +26,41 @@ cd InternProjects
 
 ---
 
-## 2. Build the Docker image
+## 2. Create the environment configuration
 
-Build the application image:
+Create a secure environment configuration file named `.env` in the project root (the same folder as `docker-compose.yml`). This file is ignored by Git and stores your local credentials.
 
-```bash
-docker build -t internprojects .
+**Windows (PowerShell):**
+
+```powershell
+New-Item .env -ItemType File
 ```
 
-Verify the image was created:
+**Linux/macOS:**
 
 ```bash
-docker images
+touch .env
 ```
+
+Open the `.env` file and add the following configuration, replacing `YourStrongPassword123!` with your own secure SQL Server password:
+
+```env
+ACCEPT_EULA=Y
+
+MSSQL_SA_PASSWORD=YourStrongPassword123!
+
+ASPNETCORE_ENVIRONMENT=Production
+
+ConnectionStrings__DefaultConnection=Server=sqlserver;Database=InternProjects;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
+
+ConnectionStrings__AppDbContext=Server=sqlserver;Database=InternProjects;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
+```
+
+> **Note:** The password used in the connection strings must match the value of `MSSQL_SA_PASSWORD`.
 
 ---
 
-## 3. Run the application container
-
-Run the container:
-
-```bash
-docker run -d \
-  --name internprojects-app \
-  -p 8080:8080 \
-  internprojects
-```
-
-The application will be available at:
-
-```
-http://localhost:8080
-```
-
----
-
-# Using Docker Compose (Recommended)
-
-## Start the application
+## 3. Build and start the application
 
 Build and start all services:
 
@@ -78,7 +74,15 @@ Run in detached mode:
 docker compose up -d --build
 ```
 
+The application will be available at:
+
+```
+http://localhost:8080
+```
+
 ---
+
+# Managing the Application
 
 ## Check running containers
 
@@ -86,7 +90,7 @@ docker compose up -d --build
 docker compose ps
 ```
 
-or:
+or
 
 ```bash
 docker ps
@@ -94,31 +98,37 @@ docker ps
 
 ---
 
-## View application logs
+## View logs
 
-View all logs:
+View logs for all services:
 
 ```bash
 docker compose logs -f
 ```
 
-View logs for a specific container:
+View logs for the web application only:
 
 ```bash
-docker logs -f internprojects-app
+docker logs -f internprojects-web
+```
+
+View logs for SQL Server:
+
+```bash
+docker logs -f internprojects-sqlserver
 ```
 
 ---
 
 ## Stop the application
 
-Stop services:
+Stop and remove all containers:
 
 ```bash
 docker compose down
 ```
 
-Remove containers:
+Remove orphaned containers:
 
 ```bash
 docker compose down --remove-orphans
@@ -128,7 +138,7 @@ docker compose down --remove-orphans
 
 # Rebuilding After Code Changes
 
-Rebuild the image:
+Rebuild the images:
 
 ```bash
 docker compose build --no-cache
@@ -156,7 +166,7 @@ Remove unused images:
 docker image prune
 ```
 
-Remove unused Docker resources:
+Remove all unused Docker resources:
 
 ```bash
 docker system prune
@@ -166,33 +176,26 @@ docker system prune
 
 # Development Commands
 
-Open a shell inside the running container:
+Open a shell inside the web application container:
 
 ```bash
-docker exec -it internprojects-app bash
+docker exec -it internprojects-web bash
 ```
 
-View container details:
+Inspect the web container:
 
 ```bash
-docker inspect internprojects-app
+docker inspect internprojects-web
 ```
 
 ---
 
 # Environment Configuration
 
-Application settings can be configured using environment variables.
+Application configuration is provided through the local `.env` file.
 
-Example:
+This file is excluded from Git by `.gitignore`, allowing each developer to use their own SQL Server password and other local settings.
 
-```yaml
-environment:
-  ASPNETCORE_ENVIRONMENT: Production
-  ConnectionStrings__DefaultConnection: "your-connection-string"
-```
-
-Do not commit secrets or production credentials into the repository.
 
 ---
 
@@ -200,9 +203,9 @@ Do not commit secrets or production credentials into the repository.
 
 Before deploying:
 
-- [ ] Update application configuration
-- [ ] Build Docker image successfully
-- [ ] Test container locally
-- [ ] Verify database connectivity
-- [ ] Check application logs
-- [ ] Deploy using Docker Compose or container orchestration
+- [ ] Create a local `.env` file.
+- [ ] Configure a secure SQL Server password.
+- [ ] Build the Docker images successfully.
+- [ ] Verify the SQL Server container is healthy.
+- [ ] Confirm the application is accessible at `http://localhost:8080`.
+- [ ] Review the application logs for any startup errors.
