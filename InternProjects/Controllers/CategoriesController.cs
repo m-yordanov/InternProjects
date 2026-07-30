@@ -88,5 +88,26 @@ namespace InternProjects.Controllers
             TempData["Success"] = $"Категорията „{category.Name}\" е обновена.";
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var category = await _context.Categories.FindAsync(id);
+
+            if (category == null)
+            {
+                TempData["Error"] = "Категорията не е намерена.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Категорията '{category.Name}' беше изтрита.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
