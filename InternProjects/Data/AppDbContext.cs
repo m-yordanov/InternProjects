@@ -67,6 +67,19 @@ namespace InternProjects.Data
                 .WithMany()
                 .HasForeignKey(t => t.InternId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TaskAssignment>()
+                .HasOne(t => t.Intern)
+                .WithMany(i => i.Assignments)
+                .HasForeignKey(t => t.InternId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TaskAssignment>()
+                .HasOne(t => t.Intern)
+                .WithMany(i => i.Assignments)
+                .HasForeignKey(t => t.InternId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

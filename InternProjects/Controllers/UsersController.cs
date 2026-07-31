@@ -205,16 +205,30 @@ namespace InternProjects.Controllers
 
             if (intern != null)
             {
+                var assignments = await _context.TaskAssignments
+                    .Include(a => a.Task)
+                    .Where(a => a.InternId == intern.Id)
+                    .ToListAsync();
+
+                foreach (var assignment in assignments)
+                {
+                    if (assignment.Task != null)
+                    {
+                        assignment.Task.Status = "Свободна";
+                    }
+
+                    _context.TaskAssignments.Remove(assignment);
+                }
+
                 _context.Interns.Remove(intern);
             }
 
             _context.Users.Remove(user);
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Потребителят беше изтрит успешно.";
             return RedirectToAction(nameof(Index));
         }
-
-
     }
 }
