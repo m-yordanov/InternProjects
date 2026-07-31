@@ -3,11 +3,27 @@
     ViewData["Title"] = "Редакция на категория";
 }
 
+
 <nav class="mb-3"><a asp-action="Index">← Категории</a></nav>
 
 <div class="row justify-content-center">
     <div class="col-lg-6">
         <h3 class="mb-4">Редакция: @Model.Name</h3>
+
+        @if (ViewData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @ViewData["Error"]
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
 
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>

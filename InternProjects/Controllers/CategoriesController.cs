@@ -93,7 +93,8 @@ namespace InternProjects.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             if (category == null)
             {
@@ -101,13 +102,24 @@ namespace InternProjects.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            bool hasTasks = await _context.TaskItems
+                .AnyAsync(t => t.CategoryId == id);
+
+            if (hasTasks)
+            {
+                ViewData["Error"] =
+                    $"Категорията „{category.Name}\" не може да бъде изтрита, защото има свързани задачи.";
+
+                return View("Edit", category);
+            }
+
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Категорията '{category.Name}' беше изтрита.";
+            TempData["Success"] =
+                $"Категорията „{category.Name}\" е изтрита.";
 
             return RedirectToAction(nameof(Index));
         }
-
     }
 }
