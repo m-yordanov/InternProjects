@@ -79,9 +79,40 @@ namespace InternProjects.Models.ViewModels
         [Display(Name = "Телефон")]
         public string? PhoneNumber { get; set; }
 
+
         [MinLength(8, ErrorMessage = "Минимум 8 символа")]
         [DataType(DataType.Password)]
         [Display(Name = "Нова парола (остави празно, за да не се променя)")]
         public string? NewPassword { get; set; }
+
+
+        public bool IsIntern { get; set; }
+
+
+        [Display(Name = "Университет/Училище")]
+        public string? University { get; set; }
+
+
+        [Display(Name = "Специалност")]
+        public string? Specialty { get; set; }
+
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Начало на стажа")]
+        public DateTime StartDate { get; set; }
+
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Край на стажа")]
+        public DateTime? EndDate { get; set; }
+
+
+        [Range(1, 1000)]
+        [Display(Name = "Общо изискуеми часове")]
+        public float TotalHours { get; set; }
+
+
+        [Display(Name = "Бележки")]
+        public string? Notes { get; set; }
     }
 }

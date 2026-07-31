@@ -112,8 +112,18 @@ namespace InternProjects.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return NotFound();
+
+            var intern = await _context.Interns
+                .FirstOrDefaultAsync(i => i.UserId == user.Id);
+
+
+            if (user == null)
+                return NotFound();
 
             var vm = new UserEditViewModel
             {
@@ -123,22 +133,59 @@ namespace InternProjects.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
             };
+
+
+            if (intern != null)
+            {
+                vm.IsIntern = true;
+                vm.University = intern.University;
+                vm.Specialty = intern.Specialty;
+                vm.StartDate = intern.StartDate;
+                vm.EndDate = intern.EndDate;
+                vm.TotalHours = intern.TotalHours;
+                vm.Notes = intern.Notes;
+            }
+
             return View(vm);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserEditViewModel model)
         {
-            var user = await _context.Users.FindAsync(model.Id);
-            if (user == null) return NotFound();
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == model.Id);
+
+            if (user == null)
+                return NotFound();
+
+            var intern = await _context.Interns
+                .FirstOrDefaultAsync(i => i.UserId == user.Id); 
+
 
             bool emailTaken = await _context.Users
                 .AnyAsync(u => u.Email == model.Email && u.Id != model.Id);
-            if (emailTaken)
-                ModelState.AddModelError(nameof(model.Email), "Имейлът е зает от друг потребител.");
 
-            if (!ModelState.IsValid) return View(model);
+            if (emailTaken)
+            {
+                ModelState.AddModelError(nameof(model.Email),
+                    "Имейлът е зает от друг потребител.");
+            }
+
+
+            if (model.IsIntern &&
+                model.EndDate != null &&
+                model.EndDate < model.StartDate)
+            {
+                ModelState.AddModelError(nameof(model.EndDate),
+                    "Краят не може да бъде преди началото.");
+            }
+
+
+            if (!ModelState.IsValid)
+                return View(model);
+
 
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
@@ -146,15 +193,35 @@ namespace InternProjects.Controllers
             user.PhoneNumber = model.PhoneNumber ?? "";
             user.UpdateDate = DateTime.Now;
 
+
             if (!string.IsNullOrEmpty(model.NewPassword))
-                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+            {
+                user.PasswordHash =
+                    BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+            }
+
+
+            if (intern != null)
+            {
+                intern.University = model.University;
+                intern.Specialty = model.Specialty;
+                intern.StartDate = model.StartDate;
+                intern.EndDate = model.EndDate;
+                intern.TotalHours = model.TotalHours;
+                intern.RemainingHours = model.TotalHours - intern.ReportedHours;
+                intern.Notes = model.Notes;
+            }
+
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"{user.FirstName} {user.LastName} е обновен"
-                + (!string.IsNullOrEmpty(model.NewPassword) ? " (с нова парола)." : ".");
+
+            TempData["Success"] =
+                $"{user.FirstName} {user.LastName} е обновен.";
+
             return RedirectToAction(nameof(Index));
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
