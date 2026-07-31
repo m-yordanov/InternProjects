@@ -61,6 +61,12 @@ namespace InternProjects.Data
                 .WithMany()
                 .HasForeignKey(i => i.MentorId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TimeLog>()
+                .HasOne(t => t.Intern)
+                .WithMany()
+                .HasForeignKey(t => t.InternId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

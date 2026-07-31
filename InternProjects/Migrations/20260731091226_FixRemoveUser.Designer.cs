@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InternProjects.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260730131641_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260731091226_FixRemoveUser")]
+    partial class FixRemoveUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,7 +106,6 @@ namespace InternProjects.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("Specialty")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
@@ -122,7 +121,6 @@ namespace InternProjects.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("University")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -502,7 +500,7 @@ namespace InternProjects.Migrations
                     b.HasOne("InternProjects.Models.Intern", "Intern")
                         .WithMany()
                         .HasForeignKey("InternId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApprovedBy");
