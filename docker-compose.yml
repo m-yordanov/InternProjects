@@ -1,4 +1,5 @@
 services:
+
   web:
     build:
       context: .
@@ -7,19 +8,20 @@ services:
     container_name: internprojects-web
 
     ports:
-      - "8080:8080"
+      - "8070:8080"
 
     depends_on:
       sqlserver:
         condition: service_healthy
 
     environment:
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection}
-      ConnectionStrings__AppDbContext: ${ConnectionStrings__AppDbContext}
+      ASPNETCORE_ENVIRONMENT: Development
+
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=InternProjectsDB;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true"
 
     networks:
       - internprojects-network
+
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2025-latest
@@ -27,7 +29,8 @@ services:
     container_name: internprojects-sqlserver
 
     environment:
-      ACCEPT_EULA: ${ACCEPT_EULA}
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
 
     ports:
@@ -35,23 +38,24 @@ services:
 
     volumes:
       - sqlserver_data:/var/opt/mssql
-      - ./backup:/var/opt/mssql/backup
 
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $$MSSQL_SA_PASSWORD -C -Q 'SELECT 1' || exit 1"
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $$MSSQL_SA_PASSWORD -C -Q 'SELECT 1'"
         ]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 20
 
     networks:
       - internprojects-network
 
+
 volumes:
   sqlserver_data:
+
 
 networks:
   internprojects-network:

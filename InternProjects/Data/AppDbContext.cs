@@ -74,11 +74,6 @@ namespace InternProjects.Data
                 .HasForeignKey(t => t.InternId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<TaskAssignment>()
-                .HasOne(t => t.Intern)
-                .WithMany(i => i.Assignments)
-                .HasForeignKey(t => t.InternId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Submission>()
                 .HasOne(s => s.Assignment)
@@ -88,7 +83,7 @@ namespace InternProjects.Data
 
             modelBuilder.Entity<TaskItem>()
                 .HasOne(t => t.Category)
-                .WithMany()
+                .WithMany(c => c.Tasks)
                 .HasForeignKey(t => t.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
