@@ -153,7 +153,7 @@ namespace InternProjects.Controllers
             if (file.Length > MaxFileSize)
                 throw new InvalidOperationException($"Файлът „{file.FileName}\" е над 20 MB.");
 
-            var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
+            var uploadsDir = FilesController.UploadsRoot(_env);
             Directory.CreateDirectory(uploadsDir);
 
             var fileName = $"{Guid.NewGuid()}{ext}";
@@ -162,7 +162,7 @@ namespace InternProjects.Controllers
             using var stream = new FileStream(fullPath, FileMode.Create);
             await file.CopyToAsync(stream);
 
-            return $"/uploads/{fileName}"; 
+            return fileName;
         }
     }
 }
