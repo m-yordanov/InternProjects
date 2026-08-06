@@ -81,38 +81,62 @@ namespace InternProjects.Controllers
             var intern = await _context.Interns.FirstOrDefaultAsync(i => i.UserId == userId);
             if (intern == null) return NotFound();
 
-            var task = await _context.TaskItems.FirstOrDefaultAsync(t => t.Id == id);
-            if (task == null) return NotFound();
+            using var transaction = await _context.Database
+                .BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
-
-            if (task.Status != "Свободна")
+            string title;
+            try
             {
-                TempData["Error"] = "Тази задача вече е заета.";
+                var task = await _context.TaskItems.FirstOrDefaultAsync(t => t.Id == id);
+                if (task == null) return NotFound();
+
+                if (task.Status != "Свободна")
+                {
+                    TempData["Error"] = "Тази задача вече е заета.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                bool alreadyHas = await _context.TaskAssignments
+                    .AnyAsync(a => a.TaskId == id && a.InternId == intern.Id);
+                if (alreadyHas)
+                {
+                    TempData["Error"] = "Вече си работил по тази задача.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var capacity = task.IsTeamTask ? Math.Max(task.MaxInterns, 1) : 1;
+                var taken = await _context.TaskAssignments.CountAsync(a => a.TaskId == id);
+
+                if (taken >= capacity)
+                {
+                    TempData["Error"] = "Тази задача вече е заета.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.TaskAssignments.Add(new TaskAssignment
+                {
+                    TaskId = task.Id,
+                    InternId = intern.Id,
+                    Status = "В процес",
+                    StartDate = DateTime.Now
+                });
+
+                if (taken + 1 >= capacity)
+                    task.Status = "В процес";
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                title = task.Title;
+            }
+            catch (DbUpdateException)
+            {
+                await transaction.RollbackAsync();
+                TempData["Error"] = "Задачата беше заета в същия момент. Опитай друга.";
                 return RedirectToAction(nameof(Index));
             }
 
-            bool alreadyHas = await _context.TaskAssignments
-                .AnyAsync(a => a.TaskId == id && a.InternId == intern.Id);
-            if (alreadyHas)
-            {
-                TempData["Error"] = "Вече си работил по тази задача.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var assignment = new TaskAssignment
-            {
-                TaskId = task.Id,
-                InternId = intern.Id,
-                Status = "В процес",
-                StartDate = DateTime.Now
-            };
-
-            task.Status = "В процес";
-
-            _context.TaskAssignments.Add(assignment);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = $"Задачата „{task.Title}\" е твоя. Успех!";
+            TempData["Success"] = $"Задачата „{title}\" е твоя. Успех!";
             return RedirectToAction("Intern", "Dashboard");
         }
 
