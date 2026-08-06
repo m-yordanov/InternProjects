@@ -106,7 +106,7 @@ namespace InternProjects.Controllers
                     .ToList(),
 
                 NearCompletionInterns = interns
-                    .Where(i => i.TotalHours > 0 && i.ReportedHours / i.TotalHours >= 200)
+                    .Where(i => i.TotalHours > 0 && i.ReportedHours / i.TotalHours >= 0.8f)
                     .OrderByDescending(i => i.ReportedHours)
                     .Take(5)
                     .ToList(),
