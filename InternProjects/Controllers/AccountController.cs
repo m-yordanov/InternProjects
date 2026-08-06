@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace ТвоятProject.Controllers
+namespace InternProjects.Controllers
 {
     public class AccountController : Controller
     {
