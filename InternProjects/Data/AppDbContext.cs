@@ -30,12 +30,6 @@ namespace InternProjects.Data
                 .HasForeignKey(t => t.ApprovedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<TimeLog>()
-                .HasOne(t => t.Intern)
-                .WithMany()
-                .HasForeignKey(t => t.InternId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Submission>()
                 .HasOne(t => t.ReviewedBy)
                 .WithMany()
