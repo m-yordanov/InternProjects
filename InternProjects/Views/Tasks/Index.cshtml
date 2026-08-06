@@ -3,21 +3,8 @@
     ViewData["Title"] = "Свободни задачи";
 }
 
-<div class="d-flex justify-content-between align-items-start mb-4">
-    <div>
-        <h2 class="mb-1">Свободни задачи</h2>
-        <p class="text-muted mb-0">Избери задача според интересите и уменията си</p>
-    </div>
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Create" class="btn btn-primary">+ Нова задача</a>
-    }
-</div>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-warning">@TempData["Error"]</div>
-}
+<h2 class="mb-1">Свободни задачи</h2>
+<p class="text-muted mb-4">Избери задача според интересите и уменията си</p>
 
 <form method="get" class="card bg-light mb-4">
     <div class="card-body row g-2 align-items-end">

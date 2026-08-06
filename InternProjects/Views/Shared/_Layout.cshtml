@@ -15,7 +15,7 @@
             <div class="container-fluid">
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (User.Identity.IsAuthenticated == true)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item"><span class="nav-link text-muted">@User.Identity.Name</span></li>
                             @if (User.IsInRole("Admin"))
@@ -30,10 +30,13 @@
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Потребители</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Index">Задания</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Manage">Задания</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Категории</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Review" asp-action="Index">Оцени</a>
                                 </li>
                             }
 
@@ -62,6 +65,14 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">@TempData["Success"]</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-warning">@TempData["Error"]</div>
+            }
             @RenderBody()
         </main>
     </div>

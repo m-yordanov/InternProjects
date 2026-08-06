@@ -6,11 +6,6 @@
 
 <nav class="mb-3"><a asp-action="Index">← Всички за проверка</a></nav>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-warning">@TempData["Error"]</div>
-}
-
 <div class="row g-4">
     <div class="col-lg-7">
         <h4 class="mb-1">@Model.Assignment.Task?.Title</h4>
@@ -54,7 +49,8 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <h6 class="fw-bold">Файл</h6>
-                        <a href="@s.SubmittedFile" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <a asp-controller="Files" asp-action="Download" asp-route-name="@s.SubmittedFile"
+                           target="_blank" class="btn btn-sm btn-outline-primary">
                             Отвори файла
                         </a>
                     </div>
@@ -70,8 +66,9 @@
                             @foreach (var photo in s.SubmittedPhotos.Split(';'))
                             {
                                 <div class="col-4">
-                                    <a href="@photo" target="_blank">
-                                        <img src="@photo" class="img-fluid rounded border" alt="Предадена снимка" />
+                                    <a href="@Url.Action("Download", "Files", new { name = photo })" target="_blank">
+                                        <img src="@Url.Action("Download", "Files", new { name = photo })"
+                                             class="img-fluid rounded border" alt="Предадена снимка" />
                                     </a>
                                 </div>
                             }

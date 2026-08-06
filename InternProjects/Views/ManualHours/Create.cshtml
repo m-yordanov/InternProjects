@@ -10,11 +10,6 @@
         <h3 class="mb-1">Ръчно добавяне на часове</h3>
         <p class="text-muted mb-4">За дейности извън задачите: обучение в сервиза, диагностика, наблюдение на ремонт... (т. 21)</p>
 
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-warning">@TempData["Error"]</div>
-        }
-
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
 
