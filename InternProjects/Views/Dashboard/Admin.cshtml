@@ -99,12 +99,24 @@
                                     { <span class="badge bg-secondary">@a.Status</span> }
                                 </td>
                                 <td>
-                                       <a class="btn btn-sm btn-outline-primary"
-                                       asp-controller="Review"
-                                       asp-action="Details"
-                                       asp-route-id="@a.TaskId">
-                                        Виж
-                                    </a>
+                                    @if (a.Status == "Приета")
+                                    {
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-controller="Tasks"
+                                           asp-action="Details"
+                                           asp-route-id="@a.TaskId">
+                                            Виж
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           asp-controller="Review"
+                                           asp-action="Details"
+                                           asp-route-id="@a.Id">
+                                            Виж
+                                        </a>
+                                    }
                                 </td>
                             </tr>
                         }
