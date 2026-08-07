@@ -36,6 +36,12 @@ namespace InternProjects.Models.ViewModels
         [Display(Name = "Първоначална парола")]
         public string Password { get; set; } = "";
 
+        [Required(ErrorMessage = "Моля потвърдете паролата")]
+        [DataType(DataType.Password)]
+        [Compare(nameof(Password), ErrorMessage = "Паролите не съвпадат")]
+        [Display(Name = "Потвърди паролата")]
+        public string ConfirmPassword { get; set; } = "";
+
         [Required(ErrorMessage = "Избери роля")]
         public string Role { get; set; } = "Intern";
 

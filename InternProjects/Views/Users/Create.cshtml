@@ -45,9 +45,17 @@
                         <div class="col-md-6 mb-3">
                             <label asp-for="Password" class="form-label">Първоначална парола *</label>
                             <input asp-for="Password" class="form-control" />
-                            <div class="form-text">Стажантът може да я смени по-късно (или ти — от Редакция)</div>
+                            <div class="form-text">Потребителят може да я смени по-късно (или ти)</div>
                             <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label">Потвърди паролата *</label>
+                            <input asp-for="ConfirmPassword" class="form-control" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="Role" class="form-label">Роля *</label>
                             <select asp-for="Role" class="form-select" id="roleSelect">

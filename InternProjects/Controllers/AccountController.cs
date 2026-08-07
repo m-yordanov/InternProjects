@@ -1,4 +1,5 @@
 ﻿using InternProjects.Data;
+using InternProjects.Models;
 using InternProjects.Models.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -72,6 +73,63 @@ namespace InternProjects.Controllers
                 "Admin" => RedirectToAction("Admin", "Dashboard"),
                 _ => RedirectToAction("Intern", "Dashboard")
             };
+        }
+
+        [HttpGet]
+        public IActionResult Register() => View(new RegisterViewModel());
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            bool emailTaken = await _context.Users.AnyAsync(u => u.Email == model.Email);
+            if (emailTaken)
+                ModelState.AddModelError(nameof(model.Email), "Потребител с този имейл вече съществува.");
+
+            if (!ModelState.IsValid) return View(model);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var user = new User
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber ?? "",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                    Role = "Intern",
+                    Status = "Активен",
+                    CreationDate = DateTime.Now
+                };
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                _context.Interns.Add(new Intern
+                {
+                    UserId = user.Id,
+                    University = model.University,
+                    Specialty = model.Specialty,
+                    StartDate = DateTime.Today,
+                    TotalHours = 240,
+                    TaskHours = 0,
+                    AddedHours = 0,
+                    ReportedHours = 0,
+                    RemainingHours = 240
+                });
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                ModelState.AddModelError("", "Грешка при регистрацията. Нищо не е записано — опитай пак.");
+                return View(model);
+            }
+
+            TempData["Success"] = "Регистрацията е успешна. Влез с имейла и паролата си.";
+            return RedirectToAction(nameof(Login));
         }
 
         [HttpPost]
