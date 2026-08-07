@@ -115,8 +115,14 @@ namespace InternProjects.Controllers
                 return View(model);
             }
 
+            var teamAssignments = await _context.TaskAssignments
+                .Where(a => a.TaskId == assignment.TaskId)
+                .ToListAsync();
+
+            var teamAssignmentIds = teamAssignments.Select(a => a.Id).ToList();
+
             int version = await _context.Submissions
-                .CountAsync(s => s.AssignmentId == assignment.Id) + 1;
+                .CountAsync(s => teamAssignmentIds.Contains(s.AssignmentId)) + 1;
 
             var submission = new Submission
             {
@@ -131,15 +137,26 @@ namespace InternProjects.Controllers
                 StatusSubmission = "Чака проверка"
             };
 
-            assignment.Status = "Предадена за проверка";
-            assignment.SubmitDate = DateTime.Now;
+            var submitDate = DateTime.Now;
+            foreach (var a in teamAssignments)
+            {
+                if (a.Id != assignment.Id
+                    && a.Status != "В процес" && a.Status != "Върната за корекция")
+                    continue;
+
+                a.Status = "Предадена за проверка";
+                a.SubmitDate = submitDate;
+            }
+
             if (assignment.Task != null)
                 assignment.Task.Status = "Предадена за проверка";
 
             _context.Submissions.Add(submission);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Задачата е предадена. Ще получиш обратна връзка след проверка.";
+            TempData["Success"] = teamAssignments.Count > 1
+                ? "Задачата е предадена за целия екип. Ще получите обратна връзка след проверка."
+                : "Задачата е предадена. Ще получиш обратна връзка след проверка.";
             return RedirectToAction("Intern", "Dashboard");
         }
 

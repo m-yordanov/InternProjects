@@ -107,7 +107,7 @@ namespace InternProjects.Controllers
                     Title = t.Title,
                     Category = t.Category!.Name,
                     Status = t.Status,
-                    ChosenBy = "—",
+                    ChosenBy = "-",
                     AssignedHours = t.AssignedHours
                 })
                 .ToListAsync();
@@ -137,7 +137,7 @@ namespace InternProjects.Controllers
                     Description = t.Description ?? "",
                     Hours = t.Hours,
                     AddedBy = t.CreatedBy != null
-                        ? t.CreatedBy.FirstName + " " + t.CreatedBy.LastName : "—"
+                        ? t.CreatedBy.FirstName + " " + t.CreatedBy.LastName : "-"
                 })
                 .ToListAsync();
         }

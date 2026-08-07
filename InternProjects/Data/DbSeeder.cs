@@ -67,7 +67,6 @@ namespace InternProjects.Data
             context.Interns.Add(intern);
             context.SaveChanges();
 
-            // ===== Категории (т. 11 от документа — седемте основни) =====
             var categories = new List<Category>
             {
                 new() { Name = "Маркетинг", Description = "Дигитален маркетинг, социални мрежи, SEO, съдържание" },

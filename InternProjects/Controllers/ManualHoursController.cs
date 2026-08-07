@@ -79,7 +79,7 @@ namespace InternProjects.Controllers
             catch
             {
                 await transaction.RollbackAsync();
-                TempData["Error"] = "Грешка при записа. Нищо не е добавено — опитай пак.";
+                TempData["Error"] = "Грешка при записа. Нищо не е добавено - опитай пак.";
                 await FillInterns(model);
                 return View(model);
             }

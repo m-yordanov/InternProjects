@@ -339,7 +339,7 @@ namespace InternProjects.Controllers
             if (task.Status == "В процес" || task.Status == "Предадена за проверка"
                 || task.Status == "Върната за корекция")
             {
-                TempData["Error"] = "Задачата е поета от стажант — първо приключете работата по нея.";
+                TempData["Error"] = "Задачата е поета от стажант - първо приключете работата по нея.";
                 return RedirectToAction(nameof(Manage));
             }
 
@@ -348,6 +348,61 @@ namespace InternProjects.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"„{task.Title}\" е архивирана.";
+            return RedirectToAction(nameof(Manage));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var task = await _context.TaskItems
+                .Include(t => t.Assignments)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (task == null) return NotFound();
+
+            if (task.Assignments.Any(a => a.Status == "В процес"
+                || a.Status == "Предадена за проверка"
+                || a.Status == "Върната за корекция"))
+            {
+                TempData["Error"] = "Задачата е поета от стажант - приключете работата по нея или я архивирайте.";
+                return RedirectToAction(nameof(Manage));
+            }
+
+            var title = task.Title;
+            var assignmentIds = task.Assignments.Select(a => a.Id).ToList();
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var timeLogs = await _context.TimeLogs
+                    .Where(t => t.AssignmentId != null && assignmentIds.Contains(t.AssignmentId.Value))
+                    .ToListAsync();
+                foreach (var log in timeLogs)
+                    log.AssignmentId = null;
+
+                var submissions = await _context.Submissions
+                    .Where(s => assignmentIds.Contains(s.AssignmentId))
+                    .ToListAsync();
+                _context.Submissions.RemoveRange(submissions);
+
+                _context.TaskAssignments.RemoveRange(task.Assignments);
+                await _context.SaveChangesAsync();
+
+                _context.TaskItems.Remove(task);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                TempData["Error"] = "Грешка при изтриването. Нищо не е записано - опитай пак.";
+                return RedirectToAction(nameof(Manage));
+            }
+
+            TempData["Success"] = $"Задачата „{title}\" е изтрита.";
             return RedirectToAction(nameof(Manage));
         }
     }

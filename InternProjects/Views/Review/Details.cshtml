@@ -10,13 +10,32 @@
     <div class="col-lg-7">
         <h4 class="mb-1">@Model.Assignment.Task?.Title</h4>
         <p class="text-muted">
-            Стажант: <strong>@Model.Assignment.Intern?.User?.FirstName @Model.Assignment.Intern?.User?.LastName</strong>
+            @if (Model.IsTeamTask)
+            {
+                <text>Екип (@Model.TeamMembers.Count):</text>
+                <strong>
+                    @string.Join(", ", Model.TeamMembers
+                        .Select(m => $"{m.Intern?.User?.FirstName} {m.Intern?.User?.LastName}".Trim()))
+                </strong>
+            }
+            else
+            {
+                <text>Стажант:</text>
+                <strong>@Model.Assignment.Intern?.User?.FirstName @Model.Assignment.Intern?.User?.LastName</strong>
+            }
             · Предадена: @Model.Assignment.SubmitDate?.ToString("dd.MM.yyyy HH:mm")
             @if (s != null)
             {
                 <span>· Версия @s.Version</span>
             }
         </p>
+
+        @if (Model.IsTeamTask)
+        {
+            <div class="alert alert-info py-2 small">
+                Екипна задача - решението важи за всички @Model.TeamMembers.Count стажанти наведнъж.
+            </div>
+        }
 
         @if (s == null)
         {
@@ -97,7 +116,7 @@
                         @foreach (var old in Model.Submissions.Skip(1))
                         {
                             <li class="border-top py-2">
-                                <strong>Версия @old.Version</strong> — @old.SubmitDate.ToString("dd.MM.yyyy")
+                                <strong>Версия @old.Version</strong> - @old.SubmitDate.ToString("dd.MM.yyyy")
                                 · @old.StatusSubmission
                                 @if (!string.IsNullOrEmpty(old.MentorFeedback))
                                 {
@@ -119,7 +138,7 @@
                     <tr><td class="text-muted">Зададени часове</td><td class="fw-bold">@Model.Assignment.Task?.AssignedHours</td></tr>
                     <tr><td class="text-muted">Изискван формат</td><td>@Model.Assignment.Task?.SubmissionFormat</td></tr>
                     <tr><td class="text-muted">Сложност</td><td>@Model.Assignment.Task?.Difficulty</td></tr>
-                    <tr><td class="text-muted">Срок</td><td>@(Model.Assignment.Task?.Deadline?.ToString("dd.MM.yyyy") ?? "—")</td></tr>
+                    <tr><td class="text-muted">Срок</td><td>@(Model.Assignment.Task?.Deadline?.ToString("dd.MM.yyyy") ?? "-")</td></tr>
                 </table>
             </div>
         </div>
@@ -131,14 +150,14 @@
                 <div class="mb-3">
                     <label class="form-label small text-muted">Обратна връзка към стажанта</label>
                     <textarea id="feedback" class="form-control" rows="4"
-                              placeholder="Напр.: „Прието. Текстът може да се използва след редакция." или „Върнато — добави поне 3 реални примера.""></textarea>
+                              placeholder="Напр.: „Прието. Текстът може да се използва след редакция." или „Върнато - добави поне 3 реални примера.""></textarea>
                 </div>
 
                 <form asp-action="Accept" asp-route-id="@Model.Assignment.Id" method="post" class="d-grid mb-2"
-                      onsubmit="return confirm('Приемаш задачата? @Model.Assignment.Task?.AssignedHours ч. ще бъдат начислени на стажанта. Действието не може да се отмени оттук.');">
+                      onsubmit="return confirm('Приемаш задачата? @Model.Assignment.Task?.AssignedHours ч. ще бъдат начислени на @(Model.IsTeamTask ? $"всеки от {Model.TeamMembers.Count} стажанти" : "стажанта"). Действието не може да се отмени оттук.');">
                     <input type="hidden" name="feedback" class="feedback-copy" />
                     <button type="submit" class="btn btn-success">
-                        ✔ Приеми (+@Model.Assignment.Task?.AssignedHours ч.)
+                        ✔ Приеми (+@Model.Assignment.Task?.AssignedHours ч.@(Model.IsTeamTask ? " на всеки" : ""))
                     </button>
                 </form>
 

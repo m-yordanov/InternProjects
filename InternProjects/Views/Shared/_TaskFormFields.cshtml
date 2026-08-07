@@ -14,7 +14,7 @@
             <div class="col-md-6 mb-3">
                 <label asp-for="CategoryId" class="form-label">Категория *</label>
                 <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
-                    <option value="">— избери —</option>
+                    <option value="">- избери -</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger small"></span>
             </div>
@@ -27,7 +27,7 @@
         <div class="mb-3">
             <label asp-for="ShortDescription" class="form-label">Кратко описание</label>
             <input asp-for="ShortDescription" class="form-control"
-                   placeholder="Едно изречение — показва се в списъка със задачи" />
+                   placeholder="Едно изречение - показва се в списъка със задачи" />
         </div>
 
         <div class="mb-0">
@@ -59,7 +59,7 @@
             <div class="col-md-4 mb-3">
                 <label asp-for="Difficulty" class="form-label">Сложност *</label>
                 <select asp-for="Difficulty" class="form-select">
-                    <option value="">— избери —</option>
+                    <option value="">- избери -</option>
                     <option>Лесна</option>
                     <option>Средна</option>
                     <option>Трудна</option>
@@ -70,7 +70,7 @@
             <div class="col-md-4 mb-3">
                 <label asp-for="Priority" class="form-label">Приоритет *</label>
                 <select asp-for="Priority" class="form-select">
-                    <option value="">— избери —</option>
+                    <option value="">- избери -</option>
                     <option>Нисък</option>
                     <option>Нормален</option>
                     <option>Висок</option>

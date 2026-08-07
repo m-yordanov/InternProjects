@@ -61,8 +61,8 @@
                         </td>
                         <td>@r.ChosenBy</td>
                         <td>@r.AssignedHours</td>
-                        <td class="text-muted small">@(r.SubmitDate?.ToString("dd.MM.yyyy") ?? "—")</td>
-                        <td class="text-muted small">@(r.AcceptDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                        <td class="text-muted small">@(r.SubmitDate?.ToString("dd.MM.yyyy") ?? "-")</td>
+                        <td class="text-muted small">@(r.AcceptDate?.ToString("dd.MM.yyyy") ?? "-")</td>
                     </tr>
                 }
             </tbody>

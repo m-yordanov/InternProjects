@@ -124,7 +124,7 @@ namespace InternProjects.Controllers
             catch
             {
                 await transaction.RollbackAsync();
-                ModelState.AddModelError("", "Грешка при регистрацията. Нищо не е записано — опитай пак.");
+                ModelState.AddModelError("", "Грешка при регистрацията. Нищо не е записано - опитай пак.");
                 return View(model);
             }
 

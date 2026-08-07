@@ -1,4 +1,4 @@
-﻿@model List<InternProjects.Models.TaskAssignment>
+﻿@model List<InternProjects.Models.ViewModels.ReviewListItemViewModel>
 @{
     ViewData["Title"] = "Задачи за проверка";
 }
@@ -12,25 +12,41 @@
             <thead class="table-light">
                 <tr>
                     <th>Задача</th>
-                    <th>Стажант</th>
+                    <th>Стажант(и)</th>
                     <th>Часове</th>
                     <th>Предадена на</th>
                     <th class="text-end">Действие</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var a in Model)
+                @foreach (var item in Model)
                 {
                     <tr>
                         <td>
-                            @a.Task?.Title
-                            <div class="small text-muted">@a.Task?.Category?.Name</div>
+                            @item.TaskTitle
+                            @if (item.IsTeamTask)
+                            {
+                                <span class="badge bg-dark ms-1">Екипна</span>
+                            }
+                            <div class="small text-muted">@item.CategoryName</div>
                         </td>
-                        <td>@a.Intern?.User?.FirstName @a.Intern?.User?.LastName</td>
-                        <td>@a.Task?.AssignedHours ч.</td>
-                        <td>@a.SubmitDate?.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            @string.Join(", ", item.MemberNames)
+                            @if (item.MemberNames.Count > 1)
+                            {
+                                <div class="small text-muted">@item.MemberNames.Count стажанти</div>
+                            }
+                        </td>
+                        <td>
+                            @item.AssignedHours ч.
+                            @if (item.MemberNames.Count > 1)
+                            {
+                                <div class="small text-muted">на всеки</div>
+                            }
+                        </td>
+                        <td>@item.SubmitDate?.ToString("dd.MM.yyyy HH:mm")</td>
                         <td class="text-end">
-                            <a asp-action="Details" asp-route-id="@a.Id" class="btn btn-sm btn-primary">
+                            <a asp-action="Details" asp-route-id="@item.AssignmentId" class="btn btn-sm btn-primary">
                                 Провери
                             </a>
                         </td>

@@ -18,15 +18,15 @@
 
                 <table class="table table-sm mb-0">
                     <tr><td class="text-muted">Имейл</td><td>@i.User?.Email</td></tr>
-                    <tr><td class="text-muted">Телефон</td><td>@(i.User?.PhoneNumber ?? "—")</td></tr>
-                    <tr><td class="text-muted">Университет</td><td>@(i.University ?? "—")</td></tr>
+                    <tr><td class="text-muted">Телефон</td><td>@(i.User?.PhoneNumber ?? "-")</td></tr>
+                    <tr><td class="text-muted">Университет</td><td>@(i.University ?? "-")</td></tr>
                     <tr><td class="text-muted">Начало на стажа</td><td>@i.StartDate.ToString("dd.MM.yyyy")</td></tr>
                     <tr>
                         <td class="text-muted">Край на стажа</td>
-                        <td>@(i.EndDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                        <td>@(i.EndDate?.ToString("dd.MM.yyyy") ?? "-")</td>
                     </tr>
 
-                    <tr><td class="text-muted">Ментор</td><td>@(i.Mentor != null ? $"{i.Mentor.FirstName} {i.Mentor.LastName}" : "—")</td></tr>
+                    <tr><td class="text-muted">Ментор</td><td>@(i.Mentor != null ? $"{i.Mentor.FirstName} {i.Mentor.LastName}" : "-")</td></tr>
                     <tr>
                         <td class="text-muted">Статус</td>
                         <td><span class="badge @(i.User?.Status == "Активен" ? "bg-success" : "bg-secondary")">@i.User?.Status</span></td>
@@ -167,7 +167,7 @@
                                 </td>
                                 <td>@t.Description</td>
                                 <td class="fw-bold">+@t.Hours ч.</td>
-                                <td class="text-muted small">@(t.CreatedBy != null ? $"{t.CreatedBy.FirstName} {t.CreatedBy.LastName}" : "—")</td>
+                                <td class="text-muted small">@(t.CreatedBy != null ? $"{t.CreatedBy.FirstName} {t.CreatedBy.LastName}" : "-")</td>
                             </tr>
                         }
                         @if (!Model.TimeLogs.Any())

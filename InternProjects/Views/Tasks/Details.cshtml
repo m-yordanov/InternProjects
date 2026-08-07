@@ -41,7 +41,7 @@
                 <table class="table table-sm mb-3">
                     <tr><td class="text-muted">Часове</td><td class="fw-bold">@Model.AssignedHours</td></tr>
                     <tr><td class="text-muted">Приоритет</td><td>@Model.Priority</td></tr>
-                    <tr><td class="text-muted">Срок</td><td>@(Model.Deadline?.ToString("dd.MM.yyyy") ?? "—")</td></tr>
+                    <tr><td class="text-muted">Срок</td><td>@(Model.Deadline?.ToString("dd.MM.yyyy") ?? "-")</td></tr>
                     <tr><td class="text-muted">Подходяща за</td><td>@(Model.SuitableFor ?? "Всички")</td></tr>
                     <tr><td class="text-muted">Статус</td><td>@Model.Status</td></tr>
                 </table>
@@ -62,7 +62,7 @@
                     }
                     else if (myAssignment.Status == "Предадена за проверка")
                     {
-                        <div class="alert alert-info text-center mb-0">Предадена — чака проверка.</div>
+                        <div class="alert alert-info text-center mb-0">Предадена - чака проверка.</div>
                     }
                     else if (myAssignment.Status == "Приета")
                     {
@@ -85,5 +85,27 @@
                 }
             </div>
         </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="card border-danger mt-3">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-2">Управление</h6>
+
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary w-100 mb-2">
+                        Редактирай
+                    </a>
+
+                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-grid"
+                          onsubmit="return confirm('Изтриваш „@Model.Title\" завинаги? Предаванията към нея също се изтриват. Отчетените часове на стажантите се запазват.');">
+                        <button type="submit" class="btn btn-outline-danger">Изтрий задачата</button>
+                    </form>
+
+                    <p class="text-muted small mt-2 mb-0">
+                        Ако задачата е в процес на изпълнение, използвай архивиране вместо изтриване.
+                    </p>
+                </div>
+            </div>
+        }
     </div>
 </div>

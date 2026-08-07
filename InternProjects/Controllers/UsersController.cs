@@ -242,7 +242,7 @@ namespace InternProjects.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = user.Status == "Неактивен"
-                ? $"{user.FirstName} {user.LastName} е деактивиран — не може да влиза в системата."
+                ? $"{user.FirstName} {user.LastName} е деактивиран - не може да влиза в системата."
                 : $"{user.FirstName} {user.LastName} е активиран.";
             return RedirectToAction(nameof(Index));
         }
