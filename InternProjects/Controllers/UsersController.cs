@@ -267,32 +267,79 @@ namespace InternProjects.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var createdTasks = await _context.TaskItems.CountAsync(t => t.CreatorId == id);
+            if (createdTasks > 0)
+            {
+                TempData["Error"] = $"Потребителят е автор на {createdTasks} задачи и не може да бъде изтрит. "
+                    + "Деактивирайте акаунта вместо това.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var intern = await _context.Interns
                 .FirstOrDefaultAsync(i => i.UserId == id);
 
-            if (intern != null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                var assignments = await _context.TaskAssignments
-                    .Include(a => a.Task)
-                    .Where(a => a.InternId == intern.Id)
-                    .ToListAsync();
-
-                foreach (var assignment in assignments)
+                if (intern != null)
                 {
-                    if (assignment.Task != null)
+                    var assignments = await _context.TaskAssignments
+                        .Include(a => a.Task)
+                        .Where(a => a.InternId == intern.Id)
+                        .ToListAsync();
+
+                    var assignmentIds = assignments.Select(a => a.Id).ToList();
+
+                    var internLogs = await _context.TimeLogs
+                        .Where(t => t.InternId == intern.Id
+                            || (t.AssignmentId != null && assignmentIds.Contains(t.AssignmentId.Value)))
+                        .ToListAsync();
+                    _context.TimeLogs.RemoveRange(internLogs);
+
+                    var submissions = await _context.Submissions
+                        .Where(s => assignmentIds.Contains(s.AssignmentId))
+                        .ToListAsync();
+                    _context.Submissions.RemoveRange(submissions);
+
+                    foreach (var assignment in assignments)
                     {
-                        assignment.Task.Status = "Свободна";
+                        if (assignment.Task != null)
+                        {
+                            assignment.Task.Status = "Свободна";
+                        }
+
+                        _context.TaskAssignments.Remove(assignment);
                     }
 
-                    _context.TaskAssignments.Remove(assignment);
+                    await _context.SaveChangesAsync();
+
+                    _context.Interns.Remove(intern);
+                    await _context.SaveChangesAsync();
                 }
 
-                _context.Interns.Remove(intern);
+                var createdLogs = await _context.TimeLogs.Where(t => t.CreatedById == id).ToListAsync();
+                foreach (var log in createdLogs) log.CreatedById = null;
+
+                var approvedLogs = await _context.TimeLogs.Where(t => t.ApprovedById == id).ToListAsync();
+                foreach (var log in approvedLogs) log.ApprovedById = null;
+
+                var reviewed = await _context.Submissions.Where(s => s.ReviewedById == id).ToListAsync();
+                foreach (var s in reviewed) s.ReviewedById = null;
+
+                var mentees = await _context.Interns.Where(i => i.MentorId == id).ToListAsync();
+                foreach (var m in mentees) m.MentorId = null;
+
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
             }
-
-            _context.Users.Remove(user);
-
-            await _context.SaveChangesAsync();
+            catch
+            {
+                await transaction.RollbackAsync();
+                TempData["Error"] = "Грешка при изтриването. Нищо не е записано - опитай пак.";
+                return RedirectToAction(nameof(Index));
+            }
 
             TempData["Success"] = "Потребителят беше изтрит успешно.";
             return RedirectToAction(nameof(Index));
