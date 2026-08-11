@@ -19,6 +19,10 @@ services:
 
       ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=InternProjectsDB;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true"
 
+    volumes:
+      - dataprotection_keys:/root/.aspnet/DataProtection-Keys
+      - uploads_data:/app/uploads
+
     networks:
       - internprojects-network
 
@@ -55,6 +59,8 @@ services:
 
 volumes:
   sqlserver_data:
+  dataprotection_keys:
+  uploads_data:
 
 
 networks:
