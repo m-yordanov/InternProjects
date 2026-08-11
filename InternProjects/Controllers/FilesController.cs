@@ -27,8 +27,12 @@ namespace InternProjects.Controllers
         {
             if (string.IsNullOrWhiteSpace(name)) return NotFound();
 
-            var fileName = Path.GetFileName(name);
-            if (fileName != name) return NotFound();
+            var fileName = Path.GetFileName(name.Replace('\\', '/'));
+            if (string.IsNullOrWhiteSpace(fileName)
+                || fileName.Contains("..")
+                || fileName.Contains('/')
+                || fileName.Contains('\\'))
+                return NotFound();
 
             var submission = await _context.Submissions
                 .Include(s => s.Assignment)
@@ -47,8 +51,13 @@ namespace InternProjects.Controllers
                     return Forbid();
             }
 
-            var fullPath = Path.Combine(UploadsRoot(_env), fileName);
-            if (!System.IO.File.Exists(fullPath)) return NotFound();
+            var candidates = new List<string> { Path.Combine(UploadsRoot(_env), fileName) };
+            if (!string.IsNullOrEmpty(_env.WebRootPath))
+                candidates.Add(Path.Combine(_env.WebRootPath, "uploads", fileName));
+
+            var fullPath = candidates.FirstOrDefault(System.IO.File.Exists);
+            if (fullPath == null)
+                return NotFound($"Файлът „{fileName}\" не е намерен на диска.");
 
             if (!new FileExtensionContentTypeProvider().TryGetContentType(fileName, out var contentType))
                 contentType = "application/octet-stream";

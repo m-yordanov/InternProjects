@@ -12,10 +12,12 @@ namespace InternProjects.Controllers
     public class AccountController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(AppDbContext context)
+        public AccountController(AppDbContext context, ILogger<AccountController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -121,9 +123,10 @@ namespace InternProjects.Controllers
 
                 await transaction.CommitAsync();
             }
-            catch
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                _logger.LogError(ex, "Registration failed for {Email}", model.Email);
                 ModelState.AddModelError("", "Грешка при регистрацията. Нищо не е записано - опитай пак.");
                 return View(model);
             }
